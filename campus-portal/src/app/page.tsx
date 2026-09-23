@@ -20,6 +20,12 @@ export default async function Home() {
     take: 4
   })
 
+  // Fetch Hero Banners
+  const heroBanners = await prisma.heroBanner.findMany({
+    where: { isActive: true },
+    orderBy: { createdAt: 'desc' }
+  })
+
   return (
     <div className="flex flex-col min-h-screen px-4 pb-20">
       
@@ -42,7 +48,7 @@ export default async function Home() {
       {/* Hero Image Slider - Only shows if NO live matches */}
       {liveEvents.length === 0 && (
         <>
-          <HeroSlider />
+          <HeroSlider banners={heroBanners} />
 
           {/* Past Highlights Gallery (Images and Videos) */}
           <section className="container mx-auto max-w-[1450px] mt-12 mb-8">
