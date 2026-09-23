@@ -2,7 +2,7 @@
 import { authOptions, getServerSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { Shield, Trophy, Code, Activity, Users, Settings } from "lucide-react"
+import { Shield, Trophy, Code, Activity, Users, Settings, Image as ImageIcon } from "lucide-react"
 
 export default async function AdminLayout({
   children,
@@ -21,6 +21,7 @@ export default async function AdminLayout({
     { name: "Sports Events", href: "/admin/sports", icon: Trophy },
     { name: "Hackathons", href: "/admin/hackathons", icon: Code },
     { name: "Cultural Events", href: "/admin/cultural", icon: Activity },
+    { name: "Highlights", href: "/admin/highlights", icon: ImageIcon },
   ]
 
   // Only real Admins can manage users or settings

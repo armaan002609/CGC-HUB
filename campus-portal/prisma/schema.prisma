@@ -282,3 +282,16 @@ model MediaAsset {
 
   createdAt       DateTime       @default(now())
 }
+
+// ------------------------------------------------------
+// HOMEPAGE HIGHLIGHTS
+// ------------------------------------------------------
+model GalleryHighlight {
+  id        String    @id @default(cuid())
+  title     String
+  tag       String
+  type      MediaType
+  url       String
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+}
