@@ -85,7 +85,7 @@ export default async function Home() {
               
               {highlights.length > 0 ? (
                 highlights.map((h, i) => (
-                    <div key={h.id} className="min-w-[85vw] sm:min-w-[320px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden relative group bg-black snap-center shrink-0">
+                    <div key={h.id} className="min-w-[85vw] sm:min-w-[320px] aspect-square rounded-2xl sm:rounded-3xl overflow-hidden relative group bg-black snap-center shrink-0">
                       {h.type === 'VIDEO' ? (
                         <VideoHighlight url={h.url} title={h.title} tag={h.tag} isLarge={true} />
                       ) : (
@@ -106,7 +106,7 @@ export default async function Home() {
               ) : (
                 /* Fallback Placeholders if no highlights added yet */
                 <>
-                  <div className="min-w-[85vw] sm:min-w-[320px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden relative group snap-center shrink-0">
+                  <div className="min-w-[85vw] sm:min-w-[320px] aspect-square rounded-2xl sm:rounded-3xl overflow-hidden relative group snap-center shrink-0">
                     <Image src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&q=80" alt="Basketball Match" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-6 left-6 right-6 text-white">
@@ -114,7 +114,7 @@ export default async function Home() {
                       <h3 className="text-xl sm:text-2xl font-bold font-display leading-tight">Inter-College Championship 2026</h3>
                     </div>
                   </div>
-                  <div className="min-w-[85vw] sm:min-w-[320px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden relative group snap-center shrink-0">
+                  <div className="min-w-[85vw] sm:min-w-[320px] aspect-square rounded-2xl sm:rounded-3xl overflow-hidden relative group snap-center shrink-0">
                     <Image src="https://images.unsplash.com/photo-1518605368461-1e1e1db7593c?w=800&q=80" alt="Soccer Match" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent"></div>
                     <div className="absolute bottom-4 left-4 right-4 text-white">
