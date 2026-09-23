@@ -17,7 +17,7 @@ export function HeroManager({ initialBanners }: { initialBanners: HeroBanner[] }
   const [banners, setBanners] = useState(initialBanners)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [file, setFile] = useState<File | null>(null)
+  const [files, setFiles] = useState<File[]>([])
   const [title, setTitle] = useState("")
   const [error, setError] = useState<string | null>(null)
   
@@ -25,61 +25,65 @@ export function HeroManager({ initialBanners }: { initialBanners: HeroBanner[] }
   const supabase = createClient()
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0])
+    if (e.target.files) {
+      setFiles(Array.from(e.target.files))
       setError(null)
     }
   }
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!file) return
+    if (files.length === 0) return
 
     setIsUploading(true)
     setError(null)
+    setUploadProgress(0)
 
     try {
-      // 1. Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
-      const filePath = `hero/${fileName}`
-
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress(prev => Math.min(prev + 10, 90))
-      }, 200)
-
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('media')
-        .upload(filePath, file)
-
-      clearInterval(progressInterval)
-      setUploadProgress(100)
-
-      if (uploadError) throw uploadError
-
-      // 2. Get Public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('media')
-        .getPublicUrl(filePath)
-
-      // 3. Save to Database via API
-      const res = await fetch('/api/hero', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          url: publicUrl,
-        })
-      })
-
-      if (!res.ok) throw new Error('Failed to save banner to database')
+      let uploadedBanners: HeroBanner[] = []
       
-      const newBanner = await res.json()
-      setBanners([newBanner, ...banners])
+      for (let i = 0; i < files.length; i++) {
+        const currentFile = files[i]
+        
+        // 1. Upload to Supabase Storage
+        const fileExt = currentFile.name.split('.').pop()
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`
+        const filePath = `hero/${fileName}`
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('media')
+          .upload(filePath, currentFile)
+
+        if (uploadError) throw uploadError
+
+        // 2. Get Public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('media')
+          .getPublicUrl(filePath)
+
+        // 3. Save to Database via API
+        const res = await fetch('/api/hero', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title, // Apply same title to all
+            url: publicUrl,
+          })
+        })
+
+        if (!res.ok) throw new Error('Failed to save banner to database')
+        
+        const newBanner = await res.json()
+        uploadedBanners.push(newBanner)
+        
+        // Update progress
+        setUploadProgress(Math.round(((i + 1) / files.length) * 100))
+      }
+      
+      setBanners([...uploadedBanners, ...banners])
       
       // Reset form
-      setFile(null)
+      setFiles([])
       setTitle("")
       setUploadProgress(0)
       router.refresh()
@@ -134,19 +138,23 @@ export function HeroManager({ initialBanners }: { initialBanners: HeroBanner[] }
           </div>
 
           <div>
-             <label className="block text-sm font-medium text-brand mb-1">Image File</label>
+             <label className="block text-sm font-medium text-brand mb-1">Image Files</label>
              <input 
                type="file" 
                accept="image/*"
+               multiple
                onChange={handleFileSelect}
                className="w-full px-4 py-2 rounded-lg border border-brand/20 bg-surface-alt/50 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand file:text-white hover:file:bg-brand-dark"
                required
              />
+             {files.length > 0 && (
+               <p className="text-xs text-brand/60 mt-2">{files.length} file(s) selected</p>
+             )}
           </div>
 
           <button 
             type="submit" 
-            disabled={!file || isUploading}
+            disabled={files.length === 0 || isUploading}
             className="px-6 py-2.5 bg-brand text-white rounded-lg font-bold text-sm tracking-wide disabled:opacity-50 flex items-center gap-2 transition-colors hover:bg-brand-dark"
           >
             {isUploading ? (
@@ -157,7 +165,7 @@ export function HeroManager({ initialBanners }: { initialBanners: HeroBanner[] }
             ) : (
               <>
                 <Upload className="w-4 h-4" />
-                Upload Banner
+                Upload Banners
               </>
             )}
           </button>
