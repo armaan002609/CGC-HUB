@@ -2,21 +2,25 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
-  // Update the session token
-  const response = await updateSession(request)
+  try {
+    // Update the session token
+    const response = await updateSession(request)
 
-  // Example basic protection for admin and profile routes
-  const path = request.nextUrl.pathname
-  const isProtectedPath = path.startsWith('/admin') || path.startsWith('/profile')
+    // Example basic protection for admin and profile routes
+    const path = request.nextUrl.pathname
+    const isProtectedPath = path.startsWith('/admin') || path.startsWith('/profile')
 
-  if (isProtectedPath) {
-    // You'd want to check if the user is actually authenticated
-    // In a real app, you might decode the token or call supabase.auth.getUser()
-    // The updateSession method refreshes it, but doesn't block by default.
-    // For simplicity, we just rely on page-level checks or enhance this later.
+    if (isProtectedPath) {
+      // You'd want to check if the user is actually authenticated
+    }
+
+    return response
+  } catch (error: any) {
+    return new NextResponse(
+      `MIDDLEWARE CRASH: ${error.message}\nStack: ${error.stack}`,
+      { status: 500 }
+    )
   }
-
-  return response
 }
 
 export const config = {
