@@ -3,6 +3,7 @@ import Image from "next/image"
 import prisma from "@/lib/db"
 import { LiveMatchCard } from "@/components/sports/LiveMatchCard"
 import { Activity } from "lucide-react"
+import { VideoHighlight } from "@/components/VideoHighlight"
 
 export default async function Home() {
   // Fetch LIVE sports events
@@ -93,21 +94,22 @@ export default async function Home() {
                   return (
                     <div key={h.id} className={`${spanClass} rounded-2xl sm:rounded-3xl overflow-hidden relative group bg-black`}>
                       {h.type === 'VIDEO' ? (
-                        <video src={h.url} autoPlay loop muted playsInline controls className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90" />
+                        <VideoHighlight url={h.url} title={h.title} tag={h.tag} isLarge={i === 0 || i === 3} />
                       ) : (
-                        <Image src={h.url} alt={h.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                        <>
+                          <Image src={h.url} alt={h.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+                          
+                          <div className="absolute bottom-4 left-4 right-4 text-white pointer-events-none">
+                            <span className="text-[10px] font-bold uppercase tracking-widest bg-brand/90 px-3 py-1 rounded-full mb-2 inline-block">
+                              {h.tag}
+                            </span>
+                            {(i === 0 || i === 3) && (
+                               <h3 className="text-lg sm:text-2xl font-bold font-display leading-tight drop-shadow-md">{h.title}</h3>
+                            )}
+                          </div>
+                        </>
                       )}
-                      
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
-                      
-                      <div className="absolute bottom-4 left-4 right-4 text-white pointer-events-none">
-                        <span className="text-[10px] font-bold uppercase tracking-widest bg-brand/90 px-3 py-1 rounded-full mb-2 inline-block">
-                          {h.tag}
-                        </span>
-                        {(i === 0 || i === 3) && (
-                           <h3 className="text-lg sm:text-2xl font-bold font-display leading-tight drop-shadow-md">{h.title}</h3>
-                        )}
-                      </div>
                     </div>
                   )
                 })
