@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link"
-import { ChevronDown, Search, Sparkles, User, LogOut, Shield } from "lucide-react"
+import { ChevronDown, Search, Sparkles, User, LogOut, Shield, Menu, X } from "lucide-react"
 import { usePathname, useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import { createClient } from "@/utils/supabase/client"
@@ -41,6 +41,7 @@ const NAV_ITEMS = [
 export function Navbar({ dbRole }: { dbRole?: string }) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -141,7 +142,7 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
         </div>
 
         {/* Auth & CTA */}
-        <div className="flex items-center gap-6 font-medium text-brand text-[15px]">
+        <div className="flex items-center gap-3 sm:gap-6 font-medium text-brand text-[15px]">
           {loading ? (
             <div className="w-8 h-8 rounded-full border-2 border-brand/20 border-t-brand animate-spin" />
           ) : session ? (
@@ -194,11 +195,78 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
             </>
           )}
 
-          <button className="w-9 h-9 rounded-full bg-brand/10 flex items-center justify-center text-brand hover:bg-brand/20 transition-colors">
+          <button className="hidden sm:flex w-9 h-9 rounded-full bg-brand/10 items-center justify-center text-brand hover:bg-brand/20 transition-colors">
             <Search className="w-4 h-4" strokeWidth={3} />
+          </button>
+          
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="md:hidden p-2 -mr-2 text-brand hover:bg-brand/5 rounded-xl transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-b border-black/5 overflow-hidden"
+          >
+            <div className="px-6 py-4 flex flex-col gap-4">
+              {NAV_ITEMS.map((item) => (
+                <div key={item.title} className="flex flex-col gap-2">
+                  <div className="font-bold text-brand text-lg">{item.title}</div>
+                  <div className="pl-4 flex flex-col gap-3">
+                    {item.card1 && (
+                      <Link 
+                        href={item.card1.href} 
+                        className="text-muted hover:text-brand font-medium text-sm flex items-center gap-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.card1.title}
+                      </Link>
+                    )}
+                    {item.card2 && (
+                      <Link 
+                        href={item.card2.href} 
+                        className="text-muted hover:text-brand font-medium text-sm flex items-center gap-2"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        {item.card2.title}
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+              
+              {!session && !loading && (
+                <div className="pt-4 mt-2 border-t border-black/5 flex flex-col gap-3">
+                  <Link 
+                    href="/login" 
+                    className="bg-surface-alt text-brand hover:bg-black/5 rounded-xl px-4 py-3 font-bold text-sm text-center transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Log in
+                  </Link>
+                  <Link 
+                    href="/signup" 
+                    className="bg-brand text-white hover:bg-brand-dark rounded-xl px-4 py-3 font-bold text-sm text-center transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   )
 }
