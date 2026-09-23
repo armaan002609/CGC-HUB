@@ -18,18 +18,29 @@ export function VideoHighlight({ url, title, tag, isLarge }: { url: string, titl
   }
 
   useEffect(() => {
+    const handleGlobalPlay = (e: Event) => {
+      const customEvent = e as CustomEvent
+      if (customEvent.detail !== url && videoRef.current) {
+        videoRef.current.pause()
+      }
+    }
+    
+    window.addEventListener('highlightVideoPlay', handleGlobalPlay)
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (!videoRef.current) return
           if (entry.isIntersecting) {
-            videoRef.current.play().catch(() => {})
+            videoRef.current.play().then(() => {
+              window.dispatchEvent(new CustomEvent('highlightVideoPlay', { detail: url }))
+            }).catch(() => {})
           } else {
             videoRef.current.pause()
           }
         })
       },
-      { threshold: 0.5 } // Play when at least 50% visible
+      { threshold: 0.6 } // Play when at least 60% visible
     )
 
     if (containerRef.current) {
@@ -37,11 +48,12 @@ export function VideoHighlight({ url, title, tag, isLarge }: { url: string, titl
     }
 
     return () => {
+      window.removeEventListener('highlightVideoPlay', handleGlobalPlay)
       if (containerRef.current) {
         observer.unobserve(containerRef.current)
       }
     }
-  }, [])
+  }, [url])
 
   return (
     <div 

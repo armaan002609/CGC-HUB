@@ -81,20 +81,13 @@ export default async function Home() {
               </button> */}
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 auto-rows-[200px]">
+            <div className="flex overflow-x-auto gap-4 pb-6 snap-x snap-mandatory scrollbar-hide">
               
               {highlights.length > 0 ? (
-                highlights.map((h, i) => {
-                  // Make the 1st one large (col-span-2 row-span-2)
-                  // Make the 4th one large horizontally (col-span-2 row-span-1)
-                  let spanClass = "col-span-2 md:col-span-1 row-span-1"
-                  if (i === 0) spanClass = "col-span-2 row-span-2"
-                  else if (i === 3) spanClass = "col-span-2 md:col-span-2 row-span-1"
-
-                  return (
-                    <div key={h.id} className={`${spanClass} rounded-2xl sm:rounded-3xl overflow-hidden relative group bg-black`}>
+                highlights.map((h, i) => (
+                    <div key={h.id} className="min-w-[85vw] sm:min-w-[320px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden relative group bg-black snap-center shrink-0">
                       {h.type === 'VIDEO' ? (
-                        <VideoHighlight url={h.url} title={h.title} tag={h.tag} isLarge={i === 0 || i === 3} />
+                        <VideoHighlight url={h.url} title={h.title} tag={h.tag} isLarge={true} />
                       ) : (
                         <>
                           <Image src={h.url} alt={h.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
@@ -104,19 +97,16 @@ export default async function Home() {
                             <span className="text-[10px] font-bold uppercase tracking-widest bg-brand/90 px-3 py-1 rounded-full mb-2 inline-block">
                               {h.tag}
                             </span>
-                            {(i === 0 || i === 3) && (
-                               <h3 className="text-lg sm:text-2xl font-bold font-display leading-tight drop-shadow-md">{h.title}</h3>
-                            )}
+                            <h3 className="text-xl sm:text-2xl font-bold font-display leading-tight drop-shadow-md">{h.title}</h3>
                           </div>
                         </>
                       )}
                     </div>
-                  )
-                })
+                  ))
               ) : (
                 /* Fallback Placeholders if no highlights added yet */
                 <>
-                  <div className="col-span-2 row-span-2 rounded-2xl sm:rounded-3xl overflow-hidden relative group">
+                  <div className="min-w-[85vw] sm:min-w-[320px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden relative group snap-center shrink-0">
                     <Image src="https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=1200&q=80" alt="Basketball Match" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                     <div className="absolute bottom-6 left-6 right-6 text-white">
@@ -124,25 +114,11 @@ export default async function Home() {
                       <h3 className="text-xl sm:text-2xl font-bold font-display leading-tight">Inter-College Championship 2026</h3>
                     </div>
                   </div>
-                  <div className="col-span-2 md:col-span-1 row-span-1 rounded-2xl sm:rounded-3xl overflow-hidden relative group">
+                  <div className="min-w-[85vw] sm:min-w-[320px] aspect-[9/16] rounded-2xl sm:rounded-3xl overflow-hidden relative group snap-center shrink-0">
                     <Image src="https://images.unsplash.com/photo-1518605368461-1e1e1db7593c?w=800&q=80" alt="Soccer Match" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent"></div>
                     <div className="absolute bottom-4 left-4 right-4 text-white">
                       <span className="text-[9px] font-bold uppercase tracking-widest bg-[#e53e3e]/90 px-2 py-0.5 rounded-full mb-2 inline-block">Football</span>
-                    </div>
-                  </div>
-                  <div className="col-span-2 md:col-span-1 row-span-1 rounded-2xl sm:rounded-3xl overflow-hidden relative group bg-black">
-                    <Image src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=800&q=80" alt="Cultural Event" fill className="object-cover opacity-60 group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <span className="text-[9px] font-bold uppercase tracking-widest bg-[#dd6b20]/90 px-2 py-0.5 rounded-full mb-2 inline-block">Cultural Fest</span>
-                    </div>
-                  </div>
-                  <div className="col-span-2 md:col-span-2 row-span-1 rounded-2xl sm:rounded-3xl overflow-hidden relative group">
-                    <Image src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=1000&q=80" alt="Hackathon" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 right-4 text-white">
-                      <span className="text-[10px] font-bold uppercase tracking-widest bg-[#38a169]/90 px-3 py-1 rounded-full mb-2 inline-block">Hackathon</span>
-                      <h3 className="text-lg font-bold font-display">48-Hour Coding Marathon</h3>
                     </div>
                   </div>
                 </>
