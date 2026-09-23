@@ -41,8 +41,8 @@ export default async function Home() {
 
       {/* Hero Image Slider - Only shows if NO live matches */}
       {liveEvents.length === 0 && (
-        <HeroSlider />
-      )}
+        <>
+          <HeroSlider />
 
           {/* Past Highlights Gallery (Images and Videos) */}
           <section className="container mx-auto max-w-[1450px] mt-12 mb-8">
