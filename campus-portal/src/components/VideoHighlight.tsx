@@ -16,12 +16,27 @@ export function VideoHighlight({ url, title, tag, isLarge }: { url: string, titl
     }
   }
 
+  const handleMouseEnter = () => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {})
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (videoRef.current) {
+      videoRef.current.pause()
+    }
+  }
+
   return (
-    <>
+    <div 
+      className="w-full h-full relative"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <video 
         ref={videoRef}
         src={url} 
-        autoPlay 
         loop 
         muted 
         playsInline 
@@ -46,6 +61,6 @@ export function VideoHighlight({ url, title, tag, isLarge }: { url: string, titl
       >
         {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
       </button>
-    </>
+    </div>
   )
 }
