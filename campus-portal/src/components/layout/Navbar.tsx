@@ -189,9 +189,6 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
               <Link href="/signup" className="hover:opacity-80 transition-opacity hidden sm:block">
                 Sign up
               </Link>
-              <Link href="/login" className="bg-brand hover:bg-brand-dark text-white rounded-full px-6 py-2.5 font-bold text-xs tracking-wider transition-colors inline-block text-center">
-                STUDENT LOGIN
-              </Link>
             </>
           )}
 
