@@ -142,7 +142,7 @@ export function HighlightsManager({ initialHighlights }: { initialHighlights: an
               <div key={h.id} className="bg-white border border-brand/5 rounded-2xl overflow-hidden shadow-sm group">
                 <div className="aspect-video relative bg-surface-alt">
                   {h.type === 'VIDEO' ? (
-                    <video src={h.url} className="w-full h-full object-cover" muted />
+                    <video src={h.url} className="w-full h-full object-cover" controls muted={false} />
                   ) : (
                     <img src={h.url} alt={h.title} className="w-full h-full object-cover" />
                   )}
