@@ -28,7 +28,7 @@ export async function createSportsEvent(formData: FormData) {
   const scheduleDate = new Date(scheduleString)
 
   // Initialize live score state for LIVE events
-  const liveScoreState = status === "LIVE" ? { scoreA: 0, scoreB: 0, status: "Starting..." } : null
+  const liveScoreState = status === "LIVE" ? { scoreA: 0, scoreB: 0, status: "Starting..." } : undefined
 
   await prisma.sportsEvent.create({
     data: {
@@ -67,7 +67,7 @@ export async function bulkCreateSportsEvents(events: any[]) {
       venue: event.venue,
       schedule: new Date(event.schedule),
       status: event.status || "UPCOMING",
-      liveScoreState: event.status === "LIVE" ? { scoreA: 0, scoreB: 0, status: "Starting..." } : null
+      liveScoreState: event.status === "LIVE" ? { scoreA: 0, scoreB: 0, status: "Starting..." } : undefined
     }
   })
 
