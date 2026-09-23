@@ -1,11 +1,12 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { Volume2, VolumeX } from "lucide-react"
 
 export function VideoHighlight({ url, title, tag, isLarge }: { url: string, title: string, tag: string, isLarge: boolean }) {
   const [isMuted, setIsMuted] = useState(true)
   const videoRef = useRef<HTMLVideoElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const toggleMute = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -16,23 +17,36 @@ export function VideoHighlight({ url, title, tag, isLarge }: { url: string, titl
     }
   }
 
-  const handleMouseEnter = () => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {})
-    }
-  }
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!videoRef.current) return
+          if (entry.isIntersecting) {
+            videoRef.current.play().catch(() => {})
+          } else {
+            videoRef.current.pause()
+          }
+        })
+      },
+      { threshold: 0.5 } // Play when at least 50% visible
+    )
 
-  const handleMouseLeave = () => {
-    if (videoRef.current) {
-      videoRef.current.pause()
+    if (containerRef.current) {
+      observer.observe(containerRef.current)
     }
-  }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current)
+      }
+    }
+  }, [])
 
   return (
     <div 
+      ref={containerRef}
       className="w-full h-full relative"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
     >
       <video 
         ref={videoRef}
