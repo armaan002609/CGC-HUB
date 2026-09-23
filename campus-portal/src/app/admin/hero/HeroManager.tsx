@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { supabase } from "@/utils/supabase/client"
+import { createClient } from "@/utils/supabase/client"
 import { Upload, X, Loader2, Image as ImageIcon, Trash2 } from "lucide-react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
@@ -22,6 +22,7 @@ export function HeroManager({ initialBanners }: { initialBanners: HeroBanner[] }
   const [error, setError] = useState<string | null>(null)
   
   const router = useRouter()
+  const supabase = createClient()
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
