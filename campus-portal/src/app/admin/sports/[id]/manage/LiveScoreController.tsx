@@ -122,14 +122,38 @@ export function LiveScoreController({ event }: { event: any }) {
             />
           </div>
           
-          <button 
-            onClick={handleSaveScore}
-            disabled={isSaving}
-            className="w-full sm:w-auto mt-4 sm:mt-0 bg-brand hover:bg-brand-dark text-white rounded-full px-8 py-3.5 font-bold text-sm tracking-wider transition-colors shadow-md disabled:opacity-50 flex justify-center items-center gap-2"
-          >
-            <Save className="w-5 h-5" />
-            {isSaving ? "SAVING..." : "PUBLISH SCORE"}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto mt-4 sm:mt-0">
+            <button 
+              onClick={async () => {
+                const finalScore = { ...scoreData, status: "Final" }
+                setScoreData(finalScore)
+                setStatus('COMPLETED')
+                setIsSaving(true)
+                try {
+                  await updateLiveScore(event.id, finalScore)
+                  await updateEventStatus(event.id, 'COMPLETED')
+                } catch (err: any) {
+                  alert(err.message)
+                } finally {
+                  setIsSaving(false)
+                }
+              }}
+              disabled={isSaving || status === 'COMPLETED'}
+              className="w-full sm:w-auto bg-red-100 hover:bg-red-200 text-red-700 border border-red-200 rounded-full px-6 py-3.5 font-bold text-sm tracking-wider transition-colors disabled:opacity-50 flex justify-center items-center gap-2"
+            >
+              <CheckCircle className="w-5 h-5" />
+              END MATCH
+            </button>
+
+            <button 
+              onClick={handleSaveScore}
+              disabled={isSaving}
+              className="w-full sm:w-auto bg-brand hover:bg-brand-dark text-white rounded-full px-8 py-3.5 font-bold text-sm tracking-wider transition-colors shadow-md disabled:opacity-50 flex justify-center items-center gap-2"
+            >
+              <Save className="w-5 h-5" />
+              {isSaving ? "SAVING..." : "PUBLISH SCORE"}
+            </button>
+          </div>
         </div>
       </div>
       
