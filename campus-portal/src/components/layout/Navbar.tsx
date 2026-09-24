@@ -260,6 +260,39 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
                   </Link>
                 </div>
               )}
+
+              {session && !loading && (
+                <div className="pt-4 mt-2 border-t border-black/5 flex flex-col gap-3">
+                  <Link 
+                    href="/profile" 
+                    className="flex items-center gap-2 bg-surface-alt text-ink hover:bg-black/5 rounded-xl px-4 py-3 font-bold text-sm transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <User className="w-4 h-4 opacity-70" />
+                    Profile
+                  </Link>
+                  {(dbRole === "ADMIN" || session.user?.user_metadata?.role === "ADMIN") && (
+                    <Link 
+                      href="/admin" 
+                      className="flex items-center gap-2 bg-surface-alt text-brand hover:bg-black/5 rounded-xl px-4 py-3 font-bold text-sm transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Shield className="w-4 h-4 opacity-70" />
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button 
+                    onClick={() => {
+                      handleSignOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 bg-[#e53e3e]/10 text-red-600 hover:bg-[#e53e3e]/20 rounded-xl px-4 py-3 font-bold text-sm transition-colors text-left"
+                  >
+                    <LogOut className="w-4 h-4 opacity-70" />
+                    Log out
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
