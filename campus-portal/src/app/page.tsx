@@ -37,9 +37,11 @@ export default async function Home() {
             <h2 className="text-2xl sm:text-3xl font-display font-black text-brand tracking-tight">Happening Now</h2>
           </div>
           
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
+          <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory gap-4 sm:gap-6 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:overflow-visible lg:snap-none hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
             {liveEvents.map((match) => (
-              <LiveMatchCard key={match.id} match={match} />
+              <div key={match.id} className="snap-center shrink-0 w-[85vw] sm:w-[400px] lg:w-auto">
+                <LiveMatchCard match={match} />
+              </div>
             ))}
           </div>
         </section>
