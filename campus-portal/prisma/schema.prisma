@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -12,18 +12,18 @@ datasource db {
 // NEXTAUTH MODELS
 // ------------------------------------------------------
 model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -62,21 +62,30 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  
+
   // Custom Fields
-  role          Role      @default(STUDENT)
-  department    String?
-  ssoId         String?   @unique
+  role       Role    @default(STUDENT)
+  department String?
+  ssoId      String? @unique
 
   // Relations
-  accounts         Account[]
-  sessions         Session[]
-  playerProfile    PlayerProfile?
-  dutyAssignments  DutyAssignment[]
-  reports          EventReport[]
-  mediaAssets      MediaAsset[]
-  registrations    TeamMember[]
-  managedSportsEvents SportsEvent[] @relation("EventManagers")
+  accounts        Account[]
+  sessions        Session[]
+  playerProfile   PlayerProfile?
+  dutyAssignments DutyAssignment[]
+  reports         EventReport[]
+  mediaAssets     MediaAsset[]
+  registrations   TeamMember[]
+
+  // Event Management & Participation
+  managedSportsEvents   SportsEvent[]   @relation("EventManagers")
+  sportsParticipated    SportsEvent[]   @relation("SportsParticipants")
+  culturalParticipated  CulturalEvent[] @relation("CulturalParticipants")
+  culturalCoordinated   CulturalEvent[] @relation("CulturalCoordinators")
+  hackathonsCoordinated Hackathon[]     @relation("HackathonCoordinators")
+
+  // Achievements
+  medals MedalLedger[] @relation("MedalWinners")
 }
 
 // ------------------------------------------------------
@@ -93,10 +102,10 @@ model PlayerProfile {
   department String?
   sports     String[]
   type       PlayerType @default(STUDENT)
-  stats      Json?      // Store flexible stats like { goals: 5, matches: 10 }
+  stats      Json? // Store flexible stats like { goals: 5, matches: 10 }
   bio        String?
 
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum EventStatus {
@@ -106,19 +115,20 @@ enum EventStatus {
 }
 
 model SportsEvent {
-  id             String       @id @default(cuid())
+  id             String      @id @default(cuid())
   title          String
   sport          String
-  teams          String[]     // e.g., ["CSE", "ECE"] or specific team names
+  teams          String[] // e.g., ["CSE", "ECE"] or specific team names
   schedule       DateTime
   venue          String
-  status         EventStatus  @default(UPCOMING)
-  liveScoreState Json?        // e.g., { teamA: 2, teamB: 1, currentSet: 1 }
+  status         EventStatus @default(UPCOMING)
+  liveScoreState Json? // e.g., { teamA: 2, teamB: 1, currentSet: 1 }
 
-  managers       User[]       @relation("EventManagers")
-  mediaAssets    MediaAsset[]
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  managers     User[]       @relation("EventManagers") // Coordinators
+  participants User[]       @relation("SportsParticipants")
+  mediaAssets  MediaAsset[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 enum MedalType {
@@ -130,60 +140,64 @@ enum MedalType {
 model MedalLedger {
   id         String    @id @default(cuid())
   year       Int
-  event      String    // e.g., "Inter-Department Basketball 2024"
+  event      String // e.g., "Inter-Department Basketball 2024"
   sport      String
-  winnerType String    // "INDIVIDUAL" or "TEAM"
-  winnerRefs String[]  // User IDs or Team Names
+  winnerType String // "INDIVIDUAL" or "TEAM"
+  winnerRefs String[] // Team Names or fallback strings
   medal      MedalType
   trophyName String?
 
-  createdAt  DateTime  @default(now())
+  users User[] @relation("MedalWinners")
+
+  createdAt DateTime @default(now())
 }
 
 // ------------------------------------------------------
 // CULTURAL MODULE
 // ------------------------------------------------------
 model CulturalEvent {
-  id          String           @id @default(cuid())
+  id          String      @id @default(cuid())
   title       String
   description String?
   schedule    DateTime
   venue       String
-  status      EventStatus      @default(UPCOMING)
+  status      EventStatus @default(UPCOMING)
 
-  assignments DutyAssignment[]
-  reports     EventReport[]
-  mediaAssets MediaAsset[]
+  assignments  DutyAssignment[]
+  participants User[]           @relation("CulturalParticipants")
+  coordinators User[]           @relation("CulturalCoordinators")
+  reports      EventReport[]
+  mediaAssets  MediaAsset[]
 
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model DutyAssignment {
-  id              String        @id @default(cuid())
-  eventId         String
-  userId          String
-  role            String        // e.g., "Coordinator", "Volunteer", "Security"
-  shiftStart      DateTime
-  shiftEnd        DateTime
-  checkInTime     DateTime?
-  checkOutTime    DateTime?
+  id           String    @id @default(cuid())
+  eventId      String
+  userId       String
+  role         String // e.g., "Coordinator", "Volunteer", "Security"
+  shiftStart   DateTime
+  shiftEnd     DateTime
+  checkInTime  DateTime?
+  checkOutTime DateTime?
 
-  event           CulturalEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event CulturalEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EventReport {
-  id              String        @id @default(cuid())
+  id              String  @id @default(cuid())
   eventId         String
   summary         String
-  attendanceCount Int           @default(0)
+  attendanceCount Int     @default(0)
   outcomes        String?
   publishedById   String
 
-  event           CulturalEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  publishedBy     User          @relation(fields: [publishedById], references: [id], onDelete: SetNull)
-  publishedAt     DateTime      @default(now())
+  event       CulturalEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  publishedBy User          @relation(fields: [publishedById], references: [id], onDelete: SetNull)
+  publishedAt DateTime      @default(now())
 }
 
 // ------------------------------------------------------
@@ -196,21 +210,22 @@ enum RegistrationStatus {
 }
 
 model Hackathon {
-  id                  String         @id @default(cuid())
-  title               String
-  description         String
-  registrationOpen    DateTime
-  registrationClose   DateTime
-  eventStartDate      DateTime
-  eventEndDate        DateTime
-  resultsDate         DateTime?
-  status              EventStatus    @default(UPCOMING)
+  id                String      @id @default(cuid())
+  title             String
+  description       String
+  registrationOpen  DateTime
+  registrationClose DateTime
+  eventStartDate    DateTime
+  eventEndDate      DateTime
+  resultsDate       DateTime?
+  status            EventStatus @default(UPCOMING)
 
-  registrations       Registration[]
-  mediaAssets         MediaAsset[]
+  registrations Registration[]
+  coordinators  User[]         @relation("HackathonCoordinators")
+  mediaAssets   MediaAsset[]
 
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Registration {
@@ -221,36 +236,36 @@ model Registration {
   status               RegistrationStatus @default(PENDING)
   submittedAt          DateTime           @default(now())
 
-  hackathon            Hackathon          @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  members              TeamMember[]
-  submission           Submission?
+  hackathon  Hackathon    @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  members    TeamMember[]
+  submission Submission?
 }
 
 model TeamMember {
-  id             String       @id @default(cuid())
+  id             String  @id @default(cuid())
   registrationId String
   userId         String
-  isLeader       Boolean      @default(false)
+  isLeader       Boolean @default(false)
 
-  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([registrationId, userId])
 }
 
 model Submission {
-  id             String       @id @default(cuid())
-  registrationId String       @unique
+  id             String  @id @default(cuid())
+  registrationId String  @unique
   projectTitle   String
   description    String
   repoUrl        String?
   score          Float?
   rank           Int?
 
-  registration   Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
-  mediaAssets    MediaAsset[]
-  
-  submittedAt    DateTime     @default(now())
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  mediaAssets  MediaAsset[]
+
+  submittedAt DateTime @default(now())
 }
 
 // ------------------------------------------------------
@@ -263,10 +278,10 @@ enum MediaType {
 }
 
 model MediaAsset {
-  id              String         @id @default(cuid())
-  type            MediaType
-  url             String
-  uploadedById    String?
+  id           String    @id @default(cuid())
+  type         MediaType
+  url          String
+  uploadedById String?
 
   // Polymorphic-like relations (only one of these will be non-null)
   sportsEventId   String?
@@ -274,13 +289,13 @@ model MediaAsset {
   hackathonId     String?
   submissionId    String?
 
-  uploadedBy      User?          @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
-  sportsEvent     SportsEvent?   @relation(fields: [sportsEventId], references: [id], onDelete: Cascade)
-  culturalEvent   CulturalEvent? @relation(fields: [culturalEventId], references: [id], onDelete: Cascade)
-  hackathon       Hackathon?     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
-  submission      Submission?    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  uploadedBy    User?          @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  sportsEvent   SportsEvent?   @relation(fields: [sportsEventId], references: [id], onDelete: Cascade)
+  culturalEvent CulturalEvent? @relation(fields: [culturalEventId], references: [id], onDelete: Cascade)
+  hackathon     Hackathon?     @relation(fields: [hackathonId], references: [id], onDelete: Cascade)
+  submission    Submission?    @relation(fields: [submissionId], references: [id], onDelete: Cascade)
 
-  createdAt       DateTime       @default(now())
+  createdAt DateTime @default(now())
 }
 
 // ------------------------------------------------------
