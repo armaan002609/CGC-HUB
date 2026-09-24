@@ -2,6 +2,7 @@ import prisma from "@/lib/db"
 import Link from "next/link"
 import { Trophy, Plus, MapPin, Calendar, Activity } from "lucide-react"
 import { CSVImportButton } from "./CSVImportButton"
+import { DeleteEventButton } from "./DeleteEventButton"
 
 export default async function AdminSportsPage() {
   const events = await prisma.sportsEvent.findMany({
@@ -91,6 +92,7 @@ export default async function AdminSportsPage() {
                     <Link href={`/admin/sports/${event.id}/manage`} className="text-brand font-bold text-sm hover:underline">
                       Manage
                     </Link>
+                    <DeleteEventButton id={event.id} />
                   </td>
                 </tr>
               ))}

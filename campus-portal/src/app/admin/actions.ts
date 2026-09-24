@@ -81,3 +81,20 @@ export async function bulkCreateSportsEvents(events: any[]) {
 
   return { success: true, count: validEvents.length }
 }
+
+export async function deleteSportsEvent(id: string) {
+  const session = await getServerSession(authOptions)
+  if (!session || (session.user.role !== "ADMIN" && session.user.role !== "MODERATOR")) {
+    throw new Error("Unauthorized")
+  }
+
+  await prisma.sportsEvent.delete({
+    where: { id }
+  })
+
+  revalidatePath("/sports/schedule")
+  revalidatePath("/sports/live")
+  revalidatePath("/admin/sports")
+
+  return { success: true }
+}
