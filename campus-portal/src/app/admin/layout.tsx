@@ -3,6 +3,7 @@ import { authOptions, getServerSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Shield, Trophy, Code, Activity, Users, Settings, Image as ImageIcon, MonitorPlay } from "lucide-react"
+import { AdminMobileNav } from "./AdminMobileNav"
 
 export default async function AdminLayout({
   children,
@@ -34,7 +35,8 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-surface">
+    <div className="flex flex-col md:flex-row min-h-screen bg-surface">
+      <AdminMobileNav links={sidebarLinks} />
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-brand/10 flex flex-col hidden md:flex">
         <div className="p-6 border-b border-brand/5">
