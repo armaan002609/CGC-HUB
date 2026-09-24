@@ -1,17 +1,38 @@
+import { notFound } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import prisma from "@/lib/db"
 
-export default function HackathonRegistrationPage() {
+export default async function HackathonRegistrationPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
+
+  const hackathon = await prisma.hackathon.findUnique({
+    where: { id }
+  })
+
+  if (!hackathon) {
+    notFound()
+  }
+
+  const now = new Date()
+  const isRegistrationOpen = now >= hackathon.registrationOpen && now <= hackathon.registrationClose
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl space-y-8">
       {/* Header */}
       <div>
-        <Badge variant="hackathons" className="mb-2">Registration Open</Badge>
-        <h1 className="text-3xl font-display font-bold">Winter CodeFest 2024</h1>
-        <p className="text-muted mt-2">Dec 15 - Dec 17 • Team Size: 2-4 members</p>
+        <Badge variant={isRegistrationOpen ? "live" : "secondary"} className="mb-2">
+          {isRegistrationOpen ? 'Registration Open' : hackathon.status}
+        </Badge>
+        <h1 className="text-3xl font-display font-bold">{hackathon.title}</h1>
+        <p className="text-muted mt-2">
+          {hackathon.eventStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} - {hackathon.eventEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+        </p>
+        <p className="mt-4 text-ink">{hackathon.description}</p>
       </div>
 
       {/* Registration Form (Progressive Disclosure Mock) */}
@@ -26,16 +47,18 @@ export default function HackathonRegistrationPage() {
         <CardContent className="space-y-6 pt-6">
           <div className="space-y-2">
             <Label htmlFor="teamName">Team Name</Label>
-            <Input id="teamName" placeholder="e.g. Byte Me" />
+            <Input id="teamName" placeholder="e.g. Byte Me" disabled={!isRegistrationOpen} />
           </div>
           
           <div className="space-y-2">
             <Label htmlFor="track">Project Track</Label>
             <select 
               id="track" 
-              className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm ring-offset-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2"
+              className="flex h-10 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm ring-offset-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!isRegistrationOpen}
+              defaultValue=""
             >
-              <option value="" disabled selected>Select a track</option>
+              <option value="" disabled>Select a track</option>
               <option value="sustainability">Sustainable Tech</option>
               <option value="edtech">EdTech Solutions</option>
               <option value="open">Open Innovation</option>
@@ -49,7 +72,9 @@ export default function HackathonRegistrationPage() {
         </CardContent>
         <CardFooter className="flex justify-end gap-4 border-t border-border pt-6">
           <Button variant="outline">Cancel</Button>
-          <Button>Continue to Members</Button>
+          <Button disabled={!isRegistrationOpen}>
+            {isRegistrationOpen ? 'Continue to Members' : 'Registration Closed'}
+          </Button>
         </CardFooter>
       </Card>
     </div>
