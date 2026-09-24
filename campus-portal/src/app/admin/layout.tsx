@@ -36,7 +36,7 @@ export default async function AdminLayout({
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-surface">
-      <AdminMobileNav links={sidebarLinks} />
+      <AdminMobileNav isAdmin={session.user.role === "ADMIN"} />
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-brand/10 flex flex-col hidden md:flex">
         <div className="p-6 border-b border-brand/5">

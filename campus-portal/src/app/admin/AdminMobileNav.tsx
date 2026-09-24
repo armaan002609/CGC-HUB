@@ -4,14 +4,26 @@ import { useState } from "react"
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
 
-type LinkItem = {
-  name: string
-  href: string
-  icon: any
-}
+import { Shield, Trophy, Code, Activity, Users as UsersIcon, Settings, Image as ImageIcon, MonitorPlay } from "lucide-react"
 
-export function AdminMobileNav({ links }: { links: LinkItem[] }) {
+export function AdminMobileNav({ isAdmin }: { isAdmin: boolean }) {
   const [isOpen, setIsOpen] = useState(false)
+
+  const links = [
+    { name: "Dashboard", href: "/admin", icon: Shield },
+    { name: "Hero Banner", href: "/admin/hero", icon: MonitorPlay },
+    { name: "Sports Events", href: "/admin/sports", icon: Trophy },
+    { name: "Hackathons", href: "/admin/hackathons", icon: Code },
+    { name: "Cultural Events", href: "/admin/cultural", icon: Activity },
+    { name: "Highlights", href: "/admin/highlights", icon: ImageIcon },
+  ]
+
+  if (isAdmin) {
+    links.push(
+      { name: "Users", href: "/admin/users", icon: UsersIcon },
+      { name: "Settings", href: "/admin/settings", icon: Settings }
+    )
+  }
 
   return (
     <>
