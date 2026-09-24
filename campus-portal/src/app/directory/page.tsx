@@ -1,13 +1,9 @@
 import prisma from "@/lib/db"
-import { Navbar } from "@/components/layout/Navbar"
 import { Users, Award, Shield, Code, Trophy, MapPin, Activity } from "lucide-react"
-import { getServerSession } from "@/lib/auth"
-import { authOptions } from "@/lib/auth"
 
 export const dynamic = "force-dynamic"
 
 export default async function StudentDirectoryPage() {
-  const session = await getServerSession(authOptions)
   
   // Fetch users with their nested participation data
   const users = await prisma.user.findMany({
@@ -25,11 +21,9 @@ export default async function StudentDirectoryPage() {
     orderBy: { name: 'asc' }
   })
 
-  // Filter to just show students and faculty (skip admins if needed, but let's show all for a unified directory)
+  // Filter to just show students and faculty
   return (
-    <div className="min-h-screen bg-[var(--color-background)]">
-      <Navbar dbRole={session?.user?.role} />
-      
+    <div className="w-full">
       <main className="container mx-auto px-6 py-12 max-w-[1450px]">
         
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-12">
