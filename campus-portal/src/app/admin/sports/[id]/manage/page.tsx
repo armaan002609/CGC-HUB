@@ -3,6 +3,8 @@ import prisma from "@/lib/db" // cache buster
 import { authOptions, getServerSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { AssignManager } from "./AssignManager"
+import { AssignParticipant } from "./AssignParticipant"
+import { AwardMedal } from "./AwardMedal"
 import { LiveScoreController } from "./LiveScoreController"
 import Link from "next/link"
 import { ArrowLeft, Trophy } from "lucide-react"
@@ -17,7 +19,10 @@ export default async function ManageEventPage({ params }: { params: Promise<{ id
 
   const event = await prisma.sportsEvent.findUnique({
     where: { id: resolvedParams.id },
-    include: { managers: true }
+    include: { 
+      managers: true,
+      participants: true 
+    }
   })
 
   if (!event) {
@@ -58,12 +63,20 @@ export default async function ManageEventPage({ params }: { params: Promise<{ id
         <div className="space-y-6">
           {/* Assign Managers is ONLY visible to true Admins */}
           {isAdmin ? (
-            <AssignManager eventId={event.id} currentManagers={event.managers} />
+            <>
+              <AssignManager eventId={event.id} currentManagers={event.managers} />
+              <AssignParticipant eventId={event.id} currentParticipants={event.participants} />
+              <AwardMedal eventId={event.id} />
+            </>
           ) : (
-            <div className="bg-brand/5 rounded-3xl p-6 border border-brand/10">
-              <h3 className="font-bold text-brand">Manager View</h3>
-              <p className="text-sm text-muted mt-2 font-medium">You have been explicitly authorized to update the live score for this specific match. Please ensure all score updates are accurate before publishing.</p>
-            </div>
+            <>
+              <div className="bg-brand/5 rounded-3xl p-6 border border-brand/10">
+                <h3 className="font-bold text-brand">Manager View</h3>
+                <p className="text-sm text-muted mt-2 font-medium">You have been explicitly authorized to update the live score for this specific match. Please ensure all score updates are accurate before publishing.</p>
+              </div>
+              <AssignParticipant eventId={event.id} currentParticipants={event.participants} />
+              <AwardMedal eventId={event.id} />
+            </>
           )}
         </div>
       </div>

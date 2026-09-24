@@ -101,3 +101,55 @@ export async function updateEventStatus(eventId: string, status: EventStatus) {
   revalidatePath(`/sports/schedule`)
   return { success: true }
 }
+
+export async function assignParticipant(eventId: string, email: string) {
+  await verifyAccess(eventId)
+  
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user) throw new Error(`No user found with email: ${email}`)
+
+  await prisma.sportsEvent.update({
+    where: { id: eventId },
+    data: { participants: { connect: { id: user.id } } }
+  })
+
+  revalidatePath(`/admin/sports/${eventId}/manage`)
+  return { success: true }
+}
+
+export async function removeParticipant(eventId: string, userId: string) {
+  await verifyAccess(eventId)
+  
+  await prisma.sportsEvent.update({
+    where: { id: eventId },
+    data: { participants: { disconnect: { id: userId } } }
+  })
+
+  revalidatePath(`/admin/sports/${eventId}/manage`)
+  return { success: true }
+}
+
+export async function awardMedal(eventId: string, email: string, medalType: "GOLD" | "SILVER" | "BRONZE") {
+  await verifyAccess(eventId)
+
+  const user = await prisma.user.findUnique({ where: { email } })
+  if (!user) throw new Error(`No user found with email: ${email}`)
+
+  const event = await prisma.sportsEvent.findUnique({ where: { id: eventId } })
+  if (!event) throw new Error("Event not found")
+
+  await prisma.medalLedger.create({
+    data: {
+      year: new Date().getFullYear(),
+      event: event.title,
+      sport: event.sport,
+      winnerType: "INDIVIDUAL",
+      winnerRefs: [user.name || user.email || "Unknown"],
+      medal: medalType,
+      users: { connect: { id: user.id } }
+    }
+  })
+
+  revalidatePath(`/admin/sports/${eventId}/manage`)
+  return { success: true }
+}
