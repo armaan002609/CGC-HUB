@@ -47,9 +47,7 @@ export default async function Home() {
         </section>
       )}
 
-      {/* Hero Image Slider - Only shows if NO live matches */}
-      {liveEvents.length === 0 && (
-        <>
+      {/* Hero Image Slider - Always shows */}
           <HeroSlider banners={heroBanners} />
 
           {/* Past Highlights Gallery (Images and Videos) */}
@@ -131,8 +129,6 @@ export default async function Home() {
 
             </div>
           </section>
-        </>
-      )}
 
       {/* Content below the hero */}
       <section className="container mx-auto max-w-[1450px] px-12 pt-24 space-y-6">
