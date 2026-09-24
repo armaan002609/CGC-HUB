@@ -42,6 +42,7 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const supabase = createClient();
@@ -147,7 +148,10 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
             <div className="w-8 h-8 rounded-full border-2 border-brand/20 border-t-brand animate-spin" />
           ) : session ? (
             <div className="group relative">
-              <button className="flex items-center gap-2 hover:bg-surface-alt px-3 py-1.5 rounded-full transition-colors">
+              <button 
+                className="flex items-center gap-2 hover:bg-surface-alt px-3 py-1.5 rounded-full transition-colors"
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              >
                 <div className="w-8 h-8 rounded-full bg-brand/10 text-brand flex items-center justify-center font-bold">
                   {session.user?.user_metadata?.name?.charAt(0).toUpperCase() || <User className="w-4 h-4" />}
                 </div>
@@ -156,7 +160,7 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
               </button>
               
               {/* Dropdown Menu */}
-              <div className="absolute top-full right-0 mt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out translate-y-2 group-hover:translate-y-0 z-50 w-48">
+              <div className={`absolute top-full right-0 mt-2 transition-all duration-200 ease-out z-50 w-48 ${isProfileMenuOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2 md:opacity-0 md:invisible md:translate-y-2'} md:group-hover:opacity-100 md:group-hover:visible md:group-hover:translate-y-0`}>
                 <div className="bg-white rounded-2xl shadow-xl border border-black/5 p-2 flex flex-col gap-1">
                   <div className="px-3 py-2 border-b border-black/5 mb-1">
                     <p className="text-xs text-muted truncate">{session.user?.email}</p>
@@ -261,38 +265,6 @@ export function Navbar({ dbRole }: { dbRole?: string }) {
                 </div>
               )}
 
-              {session && !loading && (
-                <div className="pt-4 mt-2 border-t border-black/5 flex flex-col gap-3">
-                  <Link 
-                    href="/profile" 
-                    className="flex items-center gap-2 bg-surface-alt text-ink hover:bg-black/5 rounded-xl px-4 py-3 font-bold text-sm transition-colors"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <User className="w-4 h-4 opacity-70" />
-                    Profile
-                  </Link>
-                  {(dbRole === "ADMIN" || session.user?.user_metadata?.role === "ADMIN") && (
-                    <Link 
-                      href="/admin" 
-                      className="flex items-center gap-2 bg-surface-alt text-brand hover:bg-black/5 rounded-xl px-4 py-3 font-bold text-sm transition-colors"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Shield className="w-4 h-4 opacity-70" />
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  <button 
-                    onClick={() => {
-                      handleSignOut();
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="flex items-center gap-2 bg-[#e53e3e]/10 text-red-600 hover:bg-[#e53e3e]/20 rounded-xl px-4 py-3 font-bold text-sm transition-colors text-left"
-                  >
-                    <LogOut className="w-4 h-4 opacity-70" />
-                    Log out
-                  </button>
-                </div>
-              )}
             </div>
           </motion.div>
         )}
