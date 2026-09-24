@@ -16,6 +16,13 @@ export default async function UsersManagementPage() {
   }
 
   const users = await prisma.user.findMany({
+    include: {
+      sportsParticipated: true,
+      registrations: true,
+      dutyAssignments: true,
+      culturalParticipated: true,
+      medals: true,
+    },
     orderBy: { role: 'asc' }
   })
 
@@ -58,6 +65,7 @@ export default async function UsersManagementPage() {
                 <th className="p-6 font-bold uppercase tracking-widest text-xs">User</th>
                 <th className="p-6 font-bold uppercase tracking-widest text-xs">Email</th>
                 <th className="p-6 font-bold uppercase tracking-widest text-xs">Department</th>
+                <th className="p-6 font-bold uppercase tracking-widest text-xs">Involvements</th>
                 <th className="p-6 font-bold uppercase tracking-widest text-xs">Role</th>
               </tr>
             </thead>
@@ -74,6 +82,18 @@ export default async function UsersManagementPage() {
                   </td>
                   <td className="p-6 font-medium text-muted">{user.email}</td>
                   <td className="p-6 font-medium text-ink/70">{user.department || '-'}</td>
+                  <td className="p-6">
+                    <div className="flex flex-col gap-1 text-xs font-bold text-muted">
+                      {user.sportsParticipated.length > 0 && <span className="text-[#38A169]">{user.sportsParticipated.length} Sports</span>}
+                      {user.registrations.length > 0 && <span className="text-[#3182CE]">{user.registrations.length} Hackathons</span>}
+                      {(user.culturalParticipated.length > 0 || user.dutyAssignments.length > 0) && <span className="text-[#D53F8C]">{user.culturalParticipated.length + user.dutyAssignments.length} Cultural</span>}
+                      {user.medals.length > 0 && <span className="text-[#D69E2E]">{user.medals.length} Medals</span>}
+                      
+                      {user.sportsParticipated.length === 0 && user.registrations.length === 0 && user.culturalParticipated.length === 0 && user.medals.length === 0 && user.dutyAssignments.length === 0 && (
+                        <span>None</span>
+                      )}
+                    </div>
+                  </td>
                   <td className="p-6">
                     {/* Admins cannot demote themselves */}
                     {user.id === session.user.id ? (
