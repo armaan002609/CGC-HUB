@@ -34,7 +34,7 @@ const NAV_ITEMS = [
     panel1Title: "Explore All",
     panel2Title: "Quick Links",
     card1: { title: "Calendar", desc: "View the unified schedule across all campus activities.", color: "bg-[#DD6B20]", href: "#" },
-    card2: { title: "Leaderboards", desc: "See which departments are leading in points this year.", color: "bg-[#E53E3E]", href: "#" }
+    card2: { title: "Directory", desc: "Explore student & faculty profiles, involvements, and medals.", color: "bg-[#E53E3E]", href: "/directory" }
   }
 ];
 
