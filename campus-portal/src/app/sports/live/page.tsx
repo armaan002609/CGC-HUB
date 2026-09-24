@@ -1,7 +1,7 @@
 import { Trophy, Activity } from "lucide-react"
 import prisma from "@/lib/db"
-import { LiveScoresRefresh } from "./LiveScoresRefresh"
 import { LiveMatchCard } from "@/components/sports/LiveMatchCard"
+import { LiveMatchListClient } from "@/components/sports/LiveMatchListClient"
 
 // Server Component (Data fetching happens on the server)
 export default async function LiveScoresPage() {
@@ -22,7 +22,6 @@ export default async function LiveScoresPage() {
 
   return (
     <div className="container mx-auto px-4 sm:px-6 max-w-[1450px] space-y-6 sm:space-y-10 mt-6 sm:mt-8 mb-20">
-      <LiveScoresRefresh />
       
       <div className="border-b border-black/5 pb-4 sm:pb-6">
         <div className="flex items-center gap-2 sm:gap-3 mb-2">
@@ -40,9 +39,7 @@ export default async function LiveScoresPage() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {liveEvents.map((match) => (
-            <LiveMatchCard key={match.id} match={match} />
-          ))}
+          <LiveMatchListClient initialMatches={liveEvents} layout="grid" />
         </div>
       )}
     </div>

@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import prisma from "@/lib/db"
 import { LiveMatchCard } from "@/components/sports/LiveMatchCard"
+import { LiveMatchListClient } from "@/components/sports/LiveMatchListClient"
 import { Activity } from "lucide-react"
 import { VideoHighlight } from "@/components/VideoHighlight"
 import { HeroSlider } from "@/components/HeroSlider"
@@ -38,11 +39,7 @@ export default async function Home() {
           </div>
           
           <div className="flex overflow-x-auto pb-4 snap-x snap-mandatory gap-4 sm:gap-6 lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:overflow-visible lg:snap-none hide-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-            {liveEvents.map((match) => (
-              <div key={match.id} className="snap-center shrink-0 w-[85vw] sm:w-[400px] lg:w-auto">
-                <LiveMatchCard match={match} />
-              </div>
-            ))}
+            <LiveMatchListClient initialMatches={liveEvents} layout="carousel" />
           </div>
         </section>
       )}
