@@ -1,6 +1,7 @@
 import prisma from "@/lib/db"
 import { Users } from "lucide-react"
 import { DirectoryClient } from "./DirectoryClient"
+import { DirectoryUpload } from "./DirectoryUpload"
 
 export const dynamic = "force-dynamic"
 
@@ -43,6 +44,7 @@ export default async function StudentDirectoryPage() {
           
           <div className="flex gap-4">
              {/* Future search/filter could go here */}
+             <DirectoryUpload />
           </div>
         </div>
 
